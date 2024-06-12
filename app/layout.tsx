@@ -1,11 +1,11 @@
 import Head from 'next/head';
 import './ui/global.css';
-import { inter } from './ui/invoices/fonts';
+import { inter } from './ui/utils/fonts'
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Stafko',
-  description: 'The definitive management app',
+  title: 'Galería de Fernando',
+  description: 'La galería de Fernando es un proyecto en desarrollo. ¡Vuelve pronto!',
 };
 
 export default function RootLayout({

@@ -5,36 +5,42 @@ export type User = {
   password: string;
 };
 
-export type Invoice = {
+export type Painting = {
   id: string;
-  customer_id: string;
-  amount: number;
-  date: string;
-  status: 'pending' | 'paid';
-};
-
-export type LatestInvoice = {
-  id: string;
-  name: string;
+  title: string;
+  description: string;
   image_url: string;
-  email: string;
-  amount: number;
+  price: number;
+  stock: 'in stock' | 'out of stock';
+  year: number;
+  size: string;
 };
 
-export type InvoicesTable = {
+export type LatestPainting = {
   id: string;
-  customer_id: string;
-  name: string;
-  email: string;
+  title: string;
   image_url: string;
-  date: string;
-  amount: number;
-  status: 'pending' | 'paid';
+  price: number;
 };
 
-export type InvoiceForm = {
+export type PaintingsTable = {
   id: string;
-  customer_id: string;
-  amount: number;
-  status: 'pending' | 'paid';
+  title: string;
+  description: string;
+  image_url: string;
+  price: number;
+  stock: 'in stock' | 'out of stock';
+  year: number;
+  size: string;
+};
+
+export type PaintingForm = {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  price: number;
+  stock: 'in stock' | 'out of stock';
+  year: number;
+  size: string;
 };

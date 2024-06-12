@@ -1,11 +1,11 @@
 'use client';
 
 import {
-  UserGroupIcon,
+  UserIcon,
   HomeIcon,
   CurrencyEuroIcon,
   FolderIcon,
-  ClockIcon,
+  IdentificationIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -13,29 +13,29 @@ import clsx from 'clsx';
 
 const links = [
   { 
-    name: 'Home', 
+    name: 'Inicio', 
     href: '/dashboard', 
     icon: HomeIcon 
   },
   { 
-    name: 'Projects',
-    href: '/dashboard/projects', 
+    name: 'Almacén',
+    href: '/dashboard/storage', 
     icon: FolderIcon
   },
   {
-    name: 'Tracker',
-    href: '/dashboard/tracker',
-    icon: ClockIcon,
+    name: 'Autor',
+    href: '/dashboard/author',
+    icon: UserIcon,
   },
   {
-    name: 'Invoices',
-    href: '/dashboard/invoices',
+    name: 'Tienda',
+    href: '/dashboard/shop',
     icon: CurrencyEuroIcon,
   },
-  { 
-    name: 'Customers',
-    href: '/dashboard/customers', 
-    icon: UserGroupIcon 
+  {
+    name: 'Contacto',
+    href: '/dashboard/contact',
+    icon: IdentificationIcon,
   },
 ];
 

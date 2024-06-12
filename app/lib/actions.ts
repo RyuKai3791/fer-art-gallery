@@ -6,73 +6,128 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import path from 'path';
 
-const FormSchema = z.object({
+const PaintSchema = z.object({
   id: z.string(),
-  customerId: z.string(),
-  amount: z.coerce.number(),
-  status: z.enum(['pending', 'paid']),
-  date: z.string(),
+  image_url: z.string(),
+  title: z.string(),
+  description: z.string(),
+  year: z.number(),
+  size: z.string(),
+  price: z.number(),
+  stock: z.enum(['In stock', 'Out of stock'])
 });
-  
-const CreateInvoice = FormSchema.omit({ id: true, date: true });
-const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
-export async function createInvoice(formData: FormData) {
-    const { customerId, amount, status } = CreateInvoice.parse({
-    customerId: formData.get('customerId'),
-    amount: formData.get('amount'),
-    status: formData.get('status'),
+const CreatePainting = PaintSchema.omit({ id: true, date: true });
+const UpdatePainting = PaintSchema.omit({ id: true, date: true });
+
+export async function createPainting(formData: FormData) {
+  
+  const { image_url, title, description, year, size, price, stock } = CreatePainting.parse({
+    image: formData.get('image'),
+    title: formData.get('title'),
+    description: formData.get('description'),
+    year: formData.get('year'),
+    size: formData.get('size'),
+    price: formData.get('price'),
+    stock: formData.get('stock'),
   });
-  const amountInCents = amount * 100;
+
   const date = new Date().toISOString().split('T')[0];
 
   try {
     await sql`
-      INSERT INTO invoices (customer_id, amount, status, date)
-      VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+      INSERT INTO paintings (image_url, title, description, year, size, price, stock, date)
+      VALUES (${image_url}, ${title}, ${description}, ${year}, ${size}, ${price}, ${stock}, ${date})
     `;
   } catch (error) {
     return {
-      message: 'Database error: Failed to create invoice.'
+      message: 'Database error: Failed to create painting.'
     };
   }
 
-  revalidatePath('/dashboard/invoices');
-  redirect('/dashboard/invoices');
+  revalidatePath('/dashboard/storage');
+  redirect('/dashboard/storage');
 }
 
-export async function updateInvoice(id: string, formData: FormData) {
-  const { customerId, amount, status } = UpdateInvoice.parse({
-    customerId: formData.get('customerId'),
-    amount: formData.get('amount'),
-    status: formData.get('status'),
+export async function updatePainting(id: string, formData: FormData) {
+  const { image_url, title, description, year, size, price, stock } = UpdatePainting.parse({
+    image: formData.get('image'),
+    title: formData.get('title'),
+    description: formData.get('description'),
+    year: formData.get('year'),
+    size: formData.get('size'),
+    price: formData.get('price'),
+    stock: formData.get('stock'),
   });
 
-  const amountInCents = amount * 100;
+  const amountInCents = price * 100;
   
   try {
     await sql`
-      UPDATE invoices
-      SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+      UPDATE paintings
+      SET image_url = ${image_url}, title = ${title}, description = ${description}, year = ${year}, size = ${size}, price = ${amountInCents}, stock = ${stock}
       WHERE id = ${id}
     `;
   } catch (error) {
     return {
-      message: 'Database error: Failed to update invoice.'
+      message: 'Database error: Failed to update painting.'
     };
   }
 
-  revalidatePath('/dashboard/invoices');
-  redirect('/dashboard/invoices');
+  revalidatePath('/dashboard/storage');
+  redirect('/dashboard/storage');
 }
 
-export async function deleteInvoice(id: string) {
+export async function deletePainting(id: string) {
   try {
-    await sql`DELETE FROM invoices WHERE id = ${id}`;
-    revalidatePath('/dashboard/invoices');
-    return { message: 'Deleted Invoice.' };
+    await sql`DELETE FROM paintings WHERE id = ${id}`;
+    revalidatePath('/dashboard/storage');
+    return { message: 'Deleted painting.' };
   } catch (error) {
-    return { message: 'Database error: Failed to delete invoice.' };
+    return { message: 'Database error: Failed to delete painting.' };
   }
 }
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Credenciales no válidas.';
+        default:
+          return '¡Ups! Algo salió mal. Por favor, inténtalo de nuevo.';
+      }
+    }
+    throw error;
+  }
+}
+
+export const getImages = async () => {
+  try {
+    const result = await sql`
+      SELECT image_url
+      FROM paintings
+    `;
+
+    const imageUrls = result.rows.map(row => {
+      const imageUrl = row.image_url;
+      return path.basename(imageUrl);
+    });
+
+    const validImageFilenames = imageUrls.filter(file =>
+      /\.(png|jpe?g|gif|svg)$/.test(file.toLowerCase())
+    );
+
+    return validImageFilenames;
+  } catch (error) {
+    console.error('Error fetching images from database:', error);
+    throw new Error('Failed to fetch images.');
+  }
+};
