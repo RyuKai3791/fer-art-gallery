@@ -1,4 +1,4 @@
-### Sistema de Gestión de Paintings
+### Sistema de Gestión de Paintings (EN DESARROLLO)
 
 Este proyecto es un sistema de gestión de Paintings, diseñado para manejar y mostrar información detallada sobre diversas obras de arte disponibles para la venta. Permite a los usuarios visualizar, buscar y obtener información sobre Paintings disponibles en la base de datos.
 
